@@ -3,11 +3,9 @@ import cv2
 import os
 import numpy as np
 import mediapipe as mp
-from mediapipe.framework.formats import landmark_pb2
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 from sklearn.cluster import KMeans
-import matplotlib.pyplot as plt
 import requests 
 
 
@@ -30,37 +28,6 @@ def create_face_landmarker():
         num_faces=1
     )
     return vision.FaceLandmarker.create_from_options(options)
-    annotated_image = np.copy(image)
-
-    # Draw the landmarks on the image
-    for landmarks in face_landmarks_list:
-        proto = landmark_pb2.NormalizedLandmarkList()
-        proto.landmark.extend([landmark_pb2.NormalizedLandmark(
-            x=lm.x, y=lm.y, z=lm.z) for lm in landmarks])
-
-        mp.solutions.drawing_utils.draw_landmarks(
-            image=annotated_image,
-            landmark_list=proto,
-            connections=mp.solutions.face_mesh.FACEMESH_TESSELATION,
-            connection_drawing_spec=mp.solutions.drawing_styles.get_default_face_mesh_tesselation_style()
-        )
-        mp.solutions.drawing_utils.draw_landmarks(
-            image=annotated_image,
-            landmark_list=proto,
-            connections=mp.solutions.face_mesh.FACEMESH_CONTOURS,
-            connection_drawing_spec=mp.solutions.drawing_styles.get_default_face_mesh_contours_style()
-        )
-        mp.solutions.drawing_utils.draw_landmarks(
-            image=annotated_image,
-            landmark_list=proto,
-            connections=mp.solutions.face_mesh.FACEMESH_IRISES,
-            connection_drawing_spec=mp.solutions.drawing_styles.get_default_face_mesh_iris_connections_style()
-        )
-
-    # Resize the image to a manageable size for display
-    resized_image = cv2.resize(annotated_image, (0, 0), fx=scale, fy=scale)
-
-    return resized_image
 
 # Step 4: Extract pixels inside a polygon defined by landmarks
 def get_pixels_in_polygon(image, landmarks):
